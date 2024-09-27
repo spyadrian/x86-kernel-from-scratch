@@ -14,7 +14,7 @@
 
 void gfx_init();
 
-void gfx_set_pixel(uint32_t x, uint32_t y, uint16_t color);
+void gfx_set_pixel(uint16_t x, uint16_t y, uint16_t color);
 
 void gfx_set_font_color(uint16_t color, uint16_t back_color);
 
