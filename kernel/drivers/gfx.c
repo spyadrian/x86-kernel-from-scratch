@@ -15,7 +15,7 @@ static uint16_t font_back_color = DEFAULT_FONT_BACK_COLOR;
 
 static uint16_t *pixel_to_addr(uint32_t x, uint32_t y) {
 
-    uint16_t *addr = ((uint16_t *)(_mbi->framebuffer_addr)) + (y * (uint32_t)_mbi->framebuffer_pitch / 2) + x;
+    uint16_t *addr = ((uint16_t *)((uint32_t)(_mbi->framebuffer_addr))) + (y * (uint32_t)_mbi->framebuffer_pitch / 2) + x;
     return addr;
 }
 
