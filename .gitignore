@@ -4,3 +4,8 @@ kernel.elf
 *.d
 *.o
 *.iso
+
+# - bear -
+.cache
+compile_commands.json
+
