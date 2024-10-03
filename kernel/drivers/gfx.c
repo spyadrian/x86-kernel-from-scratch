@@ -1,7 +1,9 @@
 #include "gfx.h"
 
+#include <stdarg.h>
 #include "font.h"
 #include "common/stdio.h"
+#include "boot/multiboot.h"
 
 // --- DEFINE ---
 
