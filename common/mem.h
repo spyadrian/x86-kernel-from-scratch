@@ -8,13 +8,13 @@ extern void memset(void *dst, uint8_t value, uint_t count);
 
 // Fills count dwords of the memory area pointed to by dst with the dword value.
 // NOTE: dword = double word = 32-bit
-extern void memsetdw(void *dst, uint32_t value, uint_t count);
+void memsetdw(void *dst, uint32_t value, uint_t count);
 
 // Copy count bytes from src to dst.
-extern void memcpy(void *dst, void *src, uint_t count);
+void memcpy(void *dst, void *src, uint_t count);
 
 // Copy count dwords from src to dst.
 // NOTE: dword = double word = 32-bit
-extern void memcpydw(void *dst, void *src, uint_t count);
+void memcpydw(void *dst, void *src, uint_t count);
 
 #endif

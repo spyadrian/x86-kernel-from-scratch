@@ -7,6 +7,6 @@
 #define FONT_WIDTH        8
 #define CHARS_COUNT     256
 
-extern uint8_t font_8x16[CHARS_COUNT*FONT_HEIGHT];
+uint8_t font_8x16[CHARS_COUNT*FONT_HEIGHT];
 
 #endif
