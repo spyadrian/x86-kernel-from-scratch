@@ -2,7 +2,7 @@
 #define _COLORS_H_
 
 // Convert a 24-bit color to a 16-bit one (RGB565)
-#define RGB(r,g,b) (((r & 0x1f) << 11) | ((g & 0x3f) << 5) | ((b & 0x1f) << 0))
+#define RGB(r,g,b) (((r >> 3) << 11) | ((g >> 2) << 5) | ((b >> 3) << 0))
 
 #define BLACK        RGB(0,0,0)
 #define WHITE        RGB(255,255,255)
