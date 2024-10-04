@@ -1,9 +1,8 @@
 #ifndef _GFX_H_
 #define _GFX_H_
 
-#include "common/types.h"
+#include <stdint.h>
 #include "common/colors.h"
-#include "boot/multiboot.h"
 
 // --- DEFINE ---
 
@@ -20,10 +19,16 @@ void gfx_set_font_color(uint16_t color, uint16_t back_color);
 
 void gfx_set_cursor(uint16_t x, uint16_t y);
 
+uint16_t gfx_get_cursor_x();
+
+uint16_t gfx_get_cursor_y();
+
 void gfx_fill_screen(uint16_t color);
 
 void gfx_printf_colored(uint16_t color, uint16_t back_color, char *str, ...);
 
 void gfx_printf(char *str, ...);
+
+void gfx_render_image(uint8_t *img, uint16_t width, uint16_t height, uint16_t x, uint16_t y);
 
 #endif

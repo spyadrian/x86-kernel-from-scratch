@@ -1,6 +1,7 @@
 #include "gfx.h"
 
 #include <stdarg.h>
+#include <stdint.h>
 #include "font.h"
 #include "common/stdio.h"
 #include "boot/multiboot.h"
@@ -109,6 +110,16 @@ void gfx_set_cursor(uint16_t x, uint16_t y) {
     fix_cursor();
 }
 
+uint16_t gfx_get_cursor_x() {
+
+    return cursor.x * FONT_WIDTH;
+}
+
+uint16_t gfx_get_cursor_y() {
+
+    return cursor.y * FONT_HEIGHT;
+}
+
 void gfx_fill_screen(uint16_t color) {
 
     uint16_t *p = pixel_to_addr(0, 0);
@@ -142,4 +153,25 @@ void gfx_printf(char *str, ...) {
     vprintf_colored(font_color, font_back_color, str, args);
 
     va_end(args);
+}
+
+void gfx_render_image(uint8_t *img, uint16_t width, uint16_t height, uint16_t x, uint16_t y) {
+
+    uint16_t lim_x = (x + width > _mbi->framebuffer_width) ? _mbi->framebuffer_width - x : width;
+    uint16_t lim_y = (y + height > _mbi->framebuffer_height) ? _mbi->framebuffer_height - y : height;
+
+    for (uint16_t i = 0; i < lim_y; i++) {
+
+        for (uint16_t j = 0; j < lim_x; j++) {
+            uint8_t src[3] = {0};
+            src[0] = *img++;
+            src[1] = *img++;
+            src[2] = *img++;
+
+            uint16_t color = RGB(src[0], src[1], src[2]);
+            gfx_set_pixel(x + j, y + i, color);
+        }
+
+        img += width - lim_x;
+    }
 }
