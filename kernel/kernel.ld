@@ -18,8 +18,8 @@ SECTIONS {
     .data ALIGN(4): { *(.data) }
     .bss ALIGN(4): { *(.bss) }
     
-    /* Stack section (16 byte-aligned to be compliant with the UNIX SYSTEM V ABI) */
-    .stack ALIGN(16): { *(.stack) }
+    /* Stack section (4096 byte-aligned to be compliant with the UNIX SYSTEM V ABI) */
+    .stack ALIGN(4096): { *(.stack) }
     
     ld_kernel_end = .;
 }
