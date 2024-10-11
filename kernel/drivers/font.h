@@ -19,6 +19,6 @@
  * The font data is organized as an array of 256 characters, where each character
  * takes up 16 bytes (one byte per row, 8 pixels per byte).
  */
-uint8_t font_8x16[CHARS_COUNT * FONT_HEIGHT];
+extern uint8_t font_8x16[CHARS_COUNT * FONT_HEIGHT];
 
 #endif // _FONT_H_
