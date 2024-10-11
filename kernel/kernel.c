@@ -39,6 +39,10 @@ void render_start_screen() {
                    i, module_get_addr(i), module_size(i), module_cmdline(i));
     }
 
+    // - welcome message -
+    char *msg = module_get_addr(0);
+    gfx_printf("%s\n", msg);
+
     // - logo image -
     uint8_t *img = module_get_addr(1);
 
