@@ -21,5 +21,8 @@ SECTIONS {
     /* Stack section (4096 byte-aligned to be compliant with the UNIX SYSTEM V ABI) */
     .stack ALIGN(4096): { *(.stack) }
     
+    /* Define a symbol for the top of the stack */
+    ld_stack_top = .;
+
     ld_kernel_end = .;
 }
