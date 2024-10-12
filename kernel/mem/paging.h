@@ -3,6 +3,8 @@
 
 #include "common/types.h"
 
+// --- DEFINE ---
+
 // The hardware supports 3 page sizes: 4KB, 4MB and 2MB (when PAE is enabled)
 // Our kernel only uses 4KB pages.
 #define PAGE_SIZE  4096
@@ -19,6 +21,9 @@
 
 // Returns the index of the PDE (page directory entry) for a given virtual address
 #define ADDR_TO_PDE(addr) (((uint32_t)addr) >> 22)
+
+// returns the index of the page table entry the virtual addr belongs to
+#define ADDR_TO_PTE(addr) ((((uint32_t)addr) >> 12) & 0x3FF)
 
 // Converts a 32-bit address into a page number
 #define ADDR_TO_PAGE_NB(addr) (((uint32_t)addr)/PAGE_SIZE)
@@ -63,7 +68,7 @@ typedef struct {
     uint32_t available : 3;      // unused, freely available for kernel use
     // Frame number of the PT this PDE points to.
     // To get the PT's physical address, simply multiply this by page size
-	uint32_t pagetable_frame_number : 20;
+	  uint32_t pagetable_frame_number : 20;
     // The 20 bits above are the most significant
 } __attribute__((packed)) PDE_t;
 
@@ -86,6 +91,8 @@ typedef struct {
     uint32_t frame_number : 20;  // frame number the page points to
     // The 20 bits above are the most significant
 } __attribute__((packed)) PTE_t;
+
+// --- FUNCTION ---
 
 // Setup the kernel page directory with the following two mappings:
 // - Identity map the available RAM so that the kernel can access it as if there was no paging.
