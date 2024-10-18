@@ -2,6 +2,7 @@
 
 #include "x86.h"
 #include "mem/gdt.h"
+#include "mem/paging.h"
 #include "drivers/gfx.h"
 #include "common/string.h"
 #include "drivers/module.h"
@@ -12,8 +13,8 @@
 // These are defined in the linker script: kernel.ld
 extern void ld_kernel_start();
 extern void ld_kernel_end();
-uint_t kernel_start = (uint_t)&ld_kernel_start;
-uint_t kernel_end = (uint_t)&ld_kernel_end;
+#define KERNEL_START  ((uint32_t)&ld_kernel_start)
+#define KERNEL_END    ((uint32_t)&ld_kernel_end)
 
 // -- FUNCTION --
 
@@ -28,7 +29,7 @@ void render_start_screen() {
                mbi->framebuffer_width, mbi->framebuffer_height, mbi->framebuffer_bpp, (uint32_t)mbi->framebuffer_addr, mbi->framebuffer_pitch);
     gfx_printf("Detected %d of RAM\n", multiboot_get_RAM_in_KB());
     gfx_printf("Kernel loaded at [0x%x-0x%x], size=%dKB\n",
-               kernel_start, kernel_end, (kernel_end - kernel_start) / 1024);
+               KERNEL_START, KERNEL_END, (KERNEL_END - KERNEL_START) / 1024);
 
     // - modules info -
     gfx_printf("%d module(s) found.\n", mcount);
@@ -64,6 +65,7 @@ void kernel_main(multiboot_info_t *mbi) {
     gdt_init();
     gfx_init();
     module_init();
+    paging_init(multiboot_get_RAM_in_KB());
 
     render_start_screen();
 
