@@ -17,6 +17,14 @@ static uint32_t frame_usable_end;           // end of usable frame (end ram)
 
 // --- STATIC ---
 
+/**
+ * @brief Marks a frame as used in the frame bitmap.
+ *
+ * @param frame The frame number to mark as used.
+ *
+ * This function sets the bit corresponding to the specified frame in the frame_bitmap to 1,
+ * indicating that the frame is now allocated and unavailable for future allocation.
+ */
 static void frame_mark_used(uint32_t frame) {
 
     uint32_t id = frame / 8;
@@ -25,6 +33,14 @@ static void frame_mark_used(uint32_t frame) {
     frame_bitmap[id] |= 1 << offset;
 }
 
+/**
+ * @brief Marks a frame as free in the frame bitmap.
+ *
+ * @param frame The frame number to mark as free.
+ *
+ * This function clears the bit corresponding to the specified frame in the frame_bitmap to 0,
+ * indicating that the frame is now free and available for allocation.
+ */
 static void frame_mark_free(uint32_t frame) {
 
     uint32_t id = frame / 8;
@@ -33,6 +49,15 @@ static void frame_mark_free(uint32_t frame) {
     frame_bitmap[id] &= ~(1 << offset);
 }
 
+/**
+ * @brief Checks if a frame is free.
+ *
+ * @param frame The frame number to check.
+ * @return true if the frame is free, false if the frame is used.
+ *
+ * This function reads the bit corresponding to the frame in the frame_bitmap. If the bit is 0,
+ * the frame is free; if it's 1, the frame is used.
+ */
 static bool is_frame_free(uint32_t frame) {
 
     uint32_t id = frame / 8;

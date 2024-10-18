@@ -4,12 +4,9 @@
 #include "boot/multiboot.h"
 #include "boot/multiboot_structs.h"
 #include "frame.h"
-#include "common/mem.h"
 #include "x86.h"
 
 // --- DEFINE ---
-
-#define CHECK_PAGE_ALIGN(addr) ()
 
 extern uint32_t ld_stack_top;   // defined in kernel.ld
 #define STACK_TOP ((uint32_t)&ld_stack_top)
@@ -21,11 +18,24 @@ static PDE_t kernel_pde[PAGETABLES_IN_PD] __attribute__((aligned(PAGE_SIZE)));
 
 // --- STATIC ---
 
-// Map, in the specified page directory, the page starting at virt_addr into
-// the physical address (frame) phys_addr.
-// This function dynamically allocates the necessary memory (frames) to store the
-// page table (if not previously allocated).
-// Return the new allocated page table if one was just allocated, otherwise returns 0.
+/**
+ * @brief Maps a single page into the specified page directory.
+ *
+ * @param pde        Pointer to the page directory.
+ * @param virt_addr  Virtual address of the page to map.
+ * @param phys_addr  Physical address (frame) of the page.
+ * @param privilege  Privilege level (kernel or user) for the mapping.
+ * @param access     Access type (read/write) for the page.
+ *
+ * This function maps a virtual address to a physical address by creating or modifying the
+ * appropriate page directory entry (PDE) and page table entry (PTE). If the PDE is not
+ * present (i.e., the page table does not exist), it dynamically allocates a new frame for the
+ * page table and updates the PDE. Then, it writes the PTE for the given virtual address.
+ * Both `virt_addr` and `phys_addr` must be page-aligned.
+ *
+ * @return A pointer to the newly allocated page table (if a new one was created), or 0 if the
+ * page table already existed.
+ */
 static PTE_t *mmap_page(PDE_t *pde, uint32_t virt_addr, uint32_t phys_addr, enum privilege_t privilege, enum access_t access) {
 
     // check for alignment
@@ -69,6 +79,16 @@ static PTE_t *mmap_page(PDE_t *pde, uint32_t virt_addr, uint32_t phys_addr, enum
     return 0;
 }
 
+/**
+ * @brief Unmaps a single page from the specified page directory.
+ *
+ * @param pde       Pointer to the page directory.
+ * @param virt_addr Virtual address of the page to unmap.
+ *
+ * This function unmaps the virtual address by clearing the corresponding page table entry (PTE).
+ * If the page directory entry (PDE) is not present, it halts, as this indicates an invalid 
+ * mapping.
+ */
 static void unmap_page(PDE_t *pde, uint32_t virt_addr) {
 
      uint32_t pde_idx = ADDR_TO_PDE(virt_addr);
