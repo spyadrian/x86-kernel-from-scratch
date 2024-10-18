@@ -9,3 +9,5 @@ kernel.elf
 .cache
 compile_commands.json
 
+# - debug -
+gdb_cmd.txt
