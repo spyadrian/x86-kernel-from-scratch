@@ -1,7 +1,7 @@
 #ifndef _PAGING_H_
 #define _PAGING_H_
 
-#include "common/types.h"
+#include <stdint.h>
 
 // --- DEFINE ---
 
@@ -26,13 +26,10 @@
 #define ADDR_TO_PTE(addr) ((((uint32_t)addr) >> 12) & 0x3FF)
 
 // Converts a 32-bit address into a page number
-#define ADDR_TO_PAGE_NB(addr) (((uint32_t)addr)/PAGE_SIZE)
-
-// Converts a page number into a 32-bit address
-#define PAGE_NB_TO_ADDR(n) (((uint32_t)n)*PAGE_SIZE)
+#define ADDR_TO_PAGE_NB(addr) (((uint32_t)addr) / PAGE_SIZE)
 
 // Returns the number of pages required to store the given number of bytes
-#define PAGE_COUNT(size) ((size + PAGE_SIZE - 1)/PAGE_SIZE)
+#define PAGE_COUNT(size) ((size + PAGE_SIZE - 1) / PAGE_SIZE)
 
 // For details about a page directories and a page tables, see Vol. 3A System Programming Guide Part 1
 // of the Intel 64 and IA-32 Architecture Software Dev's Manual.
@@ -98,7 +95,7 @@ typedef struct {
 // - Identity map the available RAM so that the kernel can access it as if there was no paging.
 // - Identity map the VBE framebuffer.
 // Then, loads the page directory and activate paging.
-void paging_init(uint_t RAM_in_KB);
+void paging_init(uint32_t RAM_in_KB);
 
 // Maps, in the specified page directory, size bytes starting at virtual address virt_addr
 // into physical address phys_addr. Both virtual and physical areas are contiguous.

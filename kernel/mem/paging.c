@@ -42,12 +42,12 @@ static PTE_t *mmap_page(PDE_t *pde, uint32_t virt_addr, uint32_t phys_addr, enum
 
         pde[pde_idx].present = 1;
         pde[pde_idx].rw = access;
-        pde[pde_idx].user = PRIVILEGE_USER;
+        pde[pde_idx].user = privilege;
         pde[pde_idx].page_sz = 0;
         pde[pde_idx].pagetable_frame_number = ADDR_TO_FRAME_NB(frame_addr);
 
         // - write pte -
-        PTE_t *pte = (PTE_t *)phys_addr;
+        PTE_t *pte = (PTE_t *)frame_addr;
         pte[pte_idx].present = 1;
         pte[pte_idx].rw = access;
         pte[pte_idx].user = privilege;
@@ -57,7 +57,7 @@ static PTE_t *mmap_page(PDE_t *pde, uint32_t virt_addr, uint32_t phys_addr, enum
     }
 
     // get address of the already existing table
-    uint32_t pt_phys = PAGE_NB_TO_ADDR(pde[pde_idx].pagetable_frame_number);
+    uint32_t pt_phys = FRAME_NB_TO_ADDR(pde[pde_idx].pagetable_frame_number);
     PTE_t *pte = (PTE_t *)pt_phys;
 
     // - write pte -
@@ -76,7 +76,7 @@ static void unmap_page(PDE_t *pde, uint32_t virt_addr) {
 
      if (!pde[pde_idx].present) halt();
 
-    uint32_t pt_phys = PAGE_NB_TO_ADDR(pde[pde_idx].pagetable_frame_number);
+    uint32_t pt_phys = FRAME_NB_TO_ADDR(pde[pde_idx].pagetable_frame_number);
     PTE_t *pte = (PTE_t *)pt_phys;
 
     pte[pte_idx] = (PTE_t){0};
@@ -84,7 +84,7 @@ static void unmap_page(PDE_t *pde, uint32_t virt_addr) {
 
 // --- FUNCTION ---
 
-void paging_init(uint_t RAM_in_KB) {
+void paging_init(uint32_t RAM_in_KB) {
 
     multiboot_info_t *mbi = multiboot_get_info();
 
@@ -95,14 +95,14 @@ void paging_init(uint_t RAM_in_KB) {
     paging_mmap(kernel_pde, 0x0, 0x0, RAM_in_KB * 1024, PRIVILEGE_KERNEL, ACCESS_READWRITE);
 
     // - identity mapping framebuffer -
-    uint32_t framebuffer_size = mbi->framebuffer_pitch * mbi->framebuffer_height * mbi->framebuffer_bpp; //? is the framebuffer align ?
+    uint32_t framebuffer_size = mbi->framebuffer_pitch * mbi->framebuffer_height;
 
     paging_mmap(kernel_pde, mbi->framebuffer_addr, mbi->framebuffer_addr, framebuffer_size, PRIVILEGE_KERNEL, ACCESS_READWRITE);
-    paging_mmap(kernel_pde, VIRTUAL_FRAMEBUFFER_ADDR, mbi->framebuffer_addr, framebuffer_size, PRIVILEGE_KERNEL, ACCESS_READWRITE);  
+    paging_mmap(kernel_pde, VIRTUAL_FRAMEBUFFER_ADDR, mbi->framebuffer_addr, framebuffer_size, PRIVILEGE_KERNEL, ACCESS_READWRITE);
 
     // - mapping guard page -
     unmap_page(kernel_pde, 0x0);
-    unmap_page(kernel_pde, STACK_TOP); //? is it align ?
+    unmap_page(kernel_pde, STACK_TOP);
 
     // - load page directory and enable paging -
     paging_load_pagedir(kernel_pde);
@@ -114,12 +114,10 @@ void paging_mmap(PDE_t *pde, uint32_t virt_addr, uint32_t phys_addr, uint32_t si
     // check for alignment
     if (virt_addr % PAGE_SIZE != 0 || phys_addr % PAGE_SIZE != 0) halt();
 
-    uint32_t size_rounded = (size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
-    uint32_t nb_page = size_rounded / PAGE_SIZE;
+    uint32_t nb_page = PAGE_COUNT(size);
 
     for (uint32_t i = 0; i < nb_page; i++) {
 
-        //? check for return value ?
         mmap_page(pde, virt_addr + (i * PAGE_SIZE), phys_addr + (i * PAGE_SIZE), privilege, access);
     }
 }

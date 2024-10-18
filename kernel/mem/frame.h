@@ -10,13 +10,13 @@
 #define FRAME_SIZE  4096
 
 // Converts a 32-bit address into a frame number
-#define ADDR_TO_FRAME_NB(addr) (((uint32_t)addr)/FRAME_SIZE)
+#define ADDR_TO_FRAME_NB(addr) (((uint32_t)addr) / FRAME_SIZE)
 
 // Converts a frame number into a 32-bit address
-#define FRAME_NB_TO_ADDR(n) (((uint32_t)n)*FRAME_SIZE)
+#define FRAME_NB_TO_ADDR(n) (((uint32_t)n) * FRAME_SIZE)
 
 // Returns the number of frames required to store the given number of bytes
-#define FRAME_COUNT(size) ((size + FRAME_SIZE - 1)/FRAME_SIZE)
+#define FRAME_COUNT(size) ((size + FRAME_SIZE - 1) / FRAME_SIZE)
 
 // --- FUNCTION ---
 
