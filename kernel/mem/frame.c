@@ -45,7 +45,7 @@ static bool is_frame_free(uint32_t frame) {
 
 void frame_init(uint32_t ram_kb) {
 
-    frame_usable_start = ADDR_TO_FRAME_NB(module_last_addr());
+    frame_usable_start = ADDR_TO_FRAME_NB(ALIGN_UP((uint32_t)module_last_addr(), FRAME_SIZE));
     frame_usable_end = ram_kb;
 
     // set as used everything after the RAM size
