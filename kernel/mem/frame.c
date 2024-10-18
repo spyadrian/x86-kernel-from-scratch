@@ -50,15 +50,15 @@ void frame_init(uint32_t ram_kb) {
 
     // set as used everything after the RAM size
     for (uint32_t i = frame_usable_end; i < BITMAP_SIZE; i++)
-        frame_bitmap[i] = 0xFF;
+        frame_mark_used(i);
 
     // set as free the part between the last module and the end of the ram
     for (uint32_t i = frame_usable_start; i < frame_usable_end; i++)
-        frame_bitmap[i] = 0;
+        frame_mark_free(i);
 
     // set as used everything below the last module
     for (uint32_t i = 0; i < frame_usable_start; i++)
-        frame_bitmap[i] = 0xFF;
+        frame_mark_used(i);
 }
 
 void *frame_alloc() {
@@ -67,13 +67,10 @@ void *frame_alloc() {
 
     // get first free frame
     for (uint32_t i = frame_usable_start; i < frame_usable_end; i++) {
-        for (uint8_t j = 0; j < 8; j++) {
+        if (is_frame_free(i)) {
 
-            if (!((frame_bitmap[i] >> j) & 1)) {    // is frame free 
-
-                frame_num = i * 8 + j;
-                break;
-            }
+            frame_num = i;
+            break;
         }
     }
 
@@ -101,11 +98,8 @@ uint32_t frame_total_free() {
     uint32_t count = 0;
 
     for (uint32_t i = 0; i < BITMAP_SIZE; i++) {
-        for (uint8_t j = 0; j < 8; j++) {
-
-            // is frame free ?
-            if (!((frame_bitmap[i] >> j) & 1)) count++;
-        }
+        if (is_frame_free(i))
+            count++;
     }
 
     return count;
