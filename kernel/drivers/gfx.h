@@ -52,6 +52,29 @@ uint16_t gfx_get_cursor_x();
 uint16_t gfx_get_cursor_y();
 
 /**
+ * @brief Scrolls the graphical display vertically by a specified number of rows.
+ *
+ * @param nb_row  The number of rows to scroll. A positive value scrolls the display up, 
+ *                while a negative value scrolls the display down.
+ *
+ * This function moves the content of the graphical display by a given number of rows.
+ * When scrolling up, lines at the top are removed, and empty space is added at the bottom.
+ * When scrolling down, lines at the bottom are removed, and empty space is added at the top.
+ */
+void gfx_scroll_v(int16_t nb_row);
+
+/**
+ * @brief Clears a specific line on the graphical display and fills it with a specified color.
+ *
+ * @param line    The line number to clear. The line index starts at 0 for the topmost line.
+ * @param color   The color used to fill the cleared line.
+ *
+ * This function removes any content on the specified line of the graphical display and fills
+ * the entire line with a uniform color, typically used to reset or refresh a single line of the display.
+ */
+void gfx_clear_line(uint16_t line, uint16_t color);
+
+/**
  * @brief Fills the entire screen with a single color.
  */
 void gfx_fill_screen(uint16_t color);

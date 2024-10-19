@@ -2,11 +2,15 @@
 
 #include <stdarg.h>
 #include <stdint.h>
+#include "common/colors.h"
 #include "font.h"
 #include "common/stdio.h"
 #include "boot/multiboot.h"
 
 // --- DEFINE ---
+
+#define ABS(x) (((x) < 0) ? -(x) : (x))
+#define SIGN(x) (((x) == 0) ? 0 : (((x) < 0) ? -1 : 1))
 
 #define BUFFER_SIZE 1024
 
@@ -120,10 +124,54 @@ uint16_t gfx_get_cursor_y() {
     return cursor.y * FONT_HEIGHT;
 }
 
+void gfx_scroll_v(int16_t nb_row) {
+
+    uint16_t line = (nb_row > 0) ? 0 : _mbi->framebuffer_height - 1;
+    uint16_t *p = pixel_to_addr(0, line);
+    uint8_t off_screen_width = _mbi->framebuffer_pitch / 2 - _mbi->framebuffer_width;
+
+    // scroll verticaly
+    for (uint32_t i = ABS(nb_row); i < (uint32_t)_mbi->framebuffer_height; i++) {
+        for (uint32_t j = 0; j < (uint32_t)_mbi->framebuffer_width; j++) {
+
+            *p = p[_mbi->framebuffer_width * nb_row];
+            p += SIGN(nb_row);
+        }
+
+        p += off_screen_width * SIGN(nb_row);
+    }
+
+    // clear last line
+    for (uint32_t i = 0; i < FONT_HEIGHT; i++) {
+        for (uint32_t j = 0; j < (uint32_t)_mbi->framebuffer_width; j++) {
+
+            *p = BLACK;
+            p += SIGN(nb_row);
+        }
+
+        p += off_screen_width * SIGN(nb_row);
+    }
+}
+
+void gfx_clear_line(uint16_t line, uint16_t color) {
+
+    uint16_t *p = pixel_to_addr(0, line);
+    uint16_t off_screen_width = _mbi->framebuffer_pitch / 2 - _mbi->framebuffer_width;
+
+    for (uint32_t i = 0; i < FONT_HEIGHT; i++) {
+        for (uint32_t j = 0; j < (uint32_t)_mbi->framebuffer_width; j++) {
+
+            *p++ = color;
+        }
+
+        p += off_screen_width;
+    }
+}
+
 void gfx_fill_screen(uint16_t color) {
 
     uint16_t *p = pixel_to_addr(0, 0);
-    uint8_t off_screen_width = _mbi->framebuffer_pitch - _mbi->framebuffer_width;
+    uint16_t off_screen_width = _mbi->framebuffer_pitch / 2 - _mbi->framebuffer_width;
 
     for (uint32_t i = 0; i < (uint32_t)_mbi->framebuffer_height; i++) {
         for (uint32_t j = 0; j < (uint32_t)_mbi->framebuffer_width; j++) {
@@ -131,7 +179,7 @@ void gfx_fill_screen(uint16_t color) {
             *p++ = color;
         }
 
-        *p += off_screen_width;
+        p += off_screen_width;
     }
 }
 
