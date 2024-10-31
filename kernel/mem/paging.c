@@ -91,10 +91,10 @@ static PTE_t *mmap_page(PDE_t *pde, uint32_t virt_addr, uint32_t phys_addr, enum
  */
 static void unmap_page(PDE_t *pde, uint32_t virt_addr) {
 
-     uint32_t pde_idx = ADDR_TO_PDE(virt_addr);
-     uint32_t pte_idx = ADDR_TO_PTE(virt_addr);
+    uint32_t pde_idx = ADDR_TO_PDE(virt_addr);
+    uint32_t pte_idx = ADDR_TO_PTE(virt_addr);
 
-     if (!pde[pde_idx].present) halt();
+    if (!pde[pde_idx].present) halt();
 
     uint32_t pt_phys = FRAME_NB_TO_ADDR(pde[pde_idx].pagetable_frame_number);
     PTE_t *pte = (PTE_t *)pt_phys;
