@@ -58,6 +58,7 @@ static PTE_t *mmap_page(PDE_t *pde, uint32_t virt_addr, uint32_t phys_addr, enum
 
         // - write pte -
         PTE_t *pte = (PTE_t *)frame_addr;
+
         pte[pte_idx].present = 1;
         pte[pte_idx].rw = access;
         pte[pte_idx].user = privilege;
@@ -99,7 +100,19 @@ static void unmap_page(PDE_t *pde, uint32_t virt_addr) {
     uint32_t pt_phys = FRAME_NB_TO_ADDR(pde[pde_idx].pagetable_frame_number);
     PTE_t *pte = (PTE_t *)pt_phys;
 
+    // free frame use by the page
+    frame_free((void *)FRAME_NB_TO_ADDR(pte->frame_number));
     pte[pte_idx] = (PTE_t){0};
+
+    // free page table frame number if not use anymore
+    for (uint32_t i = 0; i < PAGES_IN_PT; i++) {
+
+        if (pte[i].present == 1)
+            return;
+    }
+
+    frame_free((void *)FRAME_NB_TO_ADDR(pde[pde_idx].pagetable_frame_number));
+    pde[pde_idx] = (PDE_t){0};
 }
 
 // --- FUNCTION ---
