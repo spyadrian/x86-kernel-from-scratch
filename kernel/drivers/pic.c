@@ -1,5 +1,9 @@
-#include "pmio/pmio.h"
+#include "pic.h"
+
 #include "term.h"
+#include "pmio/pmio.h"
+
+// --- DEFINE ---
 
 #define PIC1_CMD        0x20
 #define PIC1_DATA       0x21
@@ -9,8 +13,11 @@
 // End Of Interrupt (reactivate the specified PIC)
 #define PIC_EOI         0x20
 
+// --- FUNCTION ---
+
 // More details here: http://wiki.osdev.org/8259_PIC
 void pic_init() {
+
     // By default IRQs 0-7 (master PIC) are mapped to interrupts 0x8-0xF (8-15)
     // and IRQs 8-15 (slave PIC) are mapped to interrupts 0x70-0x77 (112-119).
     // In protected mode, this scheme conflicts with CPU exceptions wich are
@@ -37,9 +44,11 @@ void pic_init() {
 }
 
 void pic_eoi(int irq) {
+
     // An EOI must also be sent to the slave for IRQs > 7
     if (irq > 7)
         outb(PIC2_CMD, PIC_EOI);
+
     // Send an EOI to the master
     outb(PIC1_CMD, PIC_EOI);
 }

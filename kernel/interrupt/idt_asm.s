@@ -68,10 +68,10 @@ exception_wrapper:
     mov     es,ax
     mov     fs,ax
     mov     gs,ax
-    
+
     ; Pass the stack pointer (which gives the CPU context) to the C function
     mov     eax,esp
-    push    eax    
+    push    eax
     call    exception_handler
     pop     eax  ; only here to balance the "push eax" done before the call
 
@@ -87,8 +87,53 @@ exception_wrapper:
     pop     ecx
     pop     ebx
     pop     eax
-    
+
 	; Fix the stack pointer due to the 2 push done before the call
 	; to exception_wrapper: error code and exception number
+    add     esp,8
+    iret
+
+irq_wrapper:
+    ; Save all registers
+    push    eax
+    push    ebx
+    push    ecx
+    push    edx
+    push    esi
+    push    edi
+    push    ebp
+    push    ds
+    push    es
+    push    fs
+    push    gs
+
+    ; Load kernel data descriptor into all segments
+    mov     ax,GDT_KERNEL_DATA_SELECTOR
+    mov     ds,ax
+    mov     es,ax
+    mov     fs,ax
+    mov     gs,ax
+
+    ; Pass the stack pointer (which gives the CPU context) to the C function
+    mov     eax,esp
+    push    eax
+    call    irq_handler
+    pop     eax  ; only here to balance the "push eax" done before the call
+
+    ; Restore all registers
+    pop     gs
+    pop     fs
+    pop     es
+    pop     ds
+    pop     ebp
+    pop     edi
+    pop     esi
+    pop     edx
+    pop     ecx
+    pop     ebx
+    pop     eax
+
+	; Fix the stack pointer due to the 2 push done before the call
+	; to irq_wrapper: error code and exception number
     add     esp,8
     iret

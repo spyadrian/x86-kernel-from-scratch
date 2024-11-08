@@ -3,13 +3,18 @@
 
 #include "common/types.h"
 
+// --- DEFINE ---
+
 #define IRQ_FIRST    0
 #define IRQ_LAST     15
 
 typedef struct {
-    void (*func)(void);  // pointer to handler function
-    char name[64];  // associate a name to the function (for debugging purposes)
+
+    void (*func)(void);   // pointer to handler function
+    char name[64];        // associate a name to the function (for debugging purposes)
 } handler_t;
+
+// --- FUNCTION ---
 
 // Initializes the array of IRQ handlers.
 void irq_init();
@@ -23,4 +28,4 @@ void irq_install_handler(uint_t irq, handler_t handler);
 // Returns NULL if there is no handler for the given IRQ.
 handler_t *irq_get_handler(uint_t irq);
 
-#endif
+#endif // _IRQ_H_

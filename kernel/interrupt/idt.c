@@ -1,10 +1,13 @@
-#include "common/types.h"
-#include "common/mem.h"
-#include "mem/gdt.h"
 #include "idt.h"
+
 #include "irq.h"
 #include "x86.h"
+#include "mem/gdt.h"
+#include "common/mem.h"
+#include "common/types.h"
 #include "descriptors.h"
+
+// --- DEFINE ---
 
 #define INTERRUPT_COUNT   256
 
@@ -25,6 +28,7 @@
 // See 5.11 of Intel 64 & IA32 architectures software developer's manual for more details.
 // For task gates, offset must be 0.
 typedef struct {
+
     uint16_t offset15_0;   // only used by trap and interrupt gates
     uint16_t selector;     // segment selector for trap and interrupt gates; TSS segment
                            // selector for task gates
@@ -37,6 +41,7 @@ typedef struct {
 
 // CPU context used when saving/restoring context from an interrupt
 typedef struct {
+
     uint32_t gs, fs, es, ds;
     uint32_t ebp, edi, esi;
     uint32_t edx, ecx, ebx, eax;
@@ -47,6 +52,7 @@ typedef struct {
 // Structure describing a pointer to the IDT gate table.
 // This format is required by the lidt instruction.
 typedef struct {
+
     uint16_t limit;   // Limit of the table (ie. its size)
     uint32_t base;    // Address of the first entry
 } __attribute__((packed)) idt_ptr_t;
@@ -59,13 +65,22 @@ static idt_ptr_t   idt_ptr;
 // Defined in idt_asm.s
 void idt_load(idt_ptr_t *idt_ptr);
 
+// Low-level ISR for processor exceptions.
+// These are defined in idt_asm.s
+void _exception3();
+void _exception8();
+
+// --- STATIC FUNCTION ---
+
 // Builds and returns an IDT entry.
 // selector is the code segment selector to access the ISR
 // offset is the address of the ISR (for task gates, offset must be 0)
 // type indicates the IDT entry type
 // dpl is the privilege level required to call the associated ISR
 static idt_entry_t idt_build_entry(uint16_t selector, uint32_t offset, uint8_t type, uint8_t dpl) {
+
     idt_entry_t entry;
+
     entry.offset15_0 = offset & 0xffff;
     entry.selector = selector;
     entry.reserved = 0;
@@ -73,29 +88,30 @@ static idt_entry_t idt_build_entry(uint16_t selector, uint32_t offset, uint8_t t
     entry.dpl = dpl;
     entry.p = 1;
     entry.offset31_16 = (offset >> 16) & 0xffff;
+
     return entry;
 }
-
-// Low-level ISR for processor exceptions.
-// These are defined in idt_asm.s
-void _exception3();
-void _exception8();
 
 // Low-level ISR for hardware interrupts.
 // These are defined in idt_asm.s
 void _irq5();
 
+// --- FUNCTIONS ---
+
 // High-level ISR for processor exceptions.
 void exception_handler(regs_t *regs) {
+
     // TODO
 }
 
 // High-level ISR for hardware interrupts.
 void irq_handler(regs_t *regs) {
+
     // TODO
 }
 
 void idt_init() {
+
     irq_init();
 
     // TODO

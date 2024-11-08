@@ -1,6 +1,8 @@
-#include "common/types.h"
-#include "common/keycodes.h"
 #include "keymap.h"
+
+#include "common/keycodes.h"
+
+// --- DEFINE ---
 
 keymap_t keymap_fr_CH = {
     // Normal mapping
