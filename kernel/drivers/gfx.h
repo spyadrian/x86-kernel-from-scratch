@@ -108,4 +108,6 @@ void gfx_printf(char *str, ...);
  */
 void gfx_render_image(uint8_t *img, uint16_t width, uint16_t height, uint16_t x, uint16_t y);
 
+void gfx_render_image_by_index(uint16_t idx, uint16_t x, uint16_t y);
+
 #endif // _GFX_H_

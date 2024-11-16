@@ -2,9 +2,12 @@
 
 #include <stdarg.h>
 #include <stdint.h>
-#include "common/colors.h"
+
 #include "font.h"
 #include "common/stdio.h"
+#include "common/string.h"
+#include "common/colors.h"
+#include "drivers/module.h"
 #include "boot/multiboot.h"
 
 // --- DEFINE ---
@@ -222,4 +225,17 @@ void gfx_render_image(uint8_t *img, uint16_t width, uint16_t height, uint16_t x,
 
         img += width - lim_x;
     }
+}
+
+void gfx_render_image_by_index(uint16_t idx, uint16_t x, uint16_t y) {
+
+    uint8_t *img = module_get_addr(idx);
+
+    char cw[8]; module_get_arg(idx, 0, cw);
+    uint16_t width = atoi(cw);
+
+    char ch[8]; module_get_arg(idx, 1, ch);
+    uint16_t height = atoi(ch);
+
+    gfx_render_image(img, width, height, x, y);
 }
