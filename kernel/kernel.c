@@ -5,6 +5,8 @@
 #include "mem/paging.h"
 #include "drivers/gfx.h"
 #include "common/string.h"
+#include "drivers/timer.h"
+#include "interrupt/idt.h"
 #include "drivers/module.h"
 #include "boot/multiboot.h"
 
@@ -45,15 +47,7 @@ void render_start_screen() {
     gfx_printf("%s\n", msg);
 
     // - logo image -
-    uint8_t *img = module_get_addr(1);
-
-    char cw[8]; module_get_arg(1, 0, cw);
-    uint16_t width = atoi(cw);
-
-    char ch[8]; module_get_arg(1, 1, ch);
-    uint16_t height = atoi(ch);
-
-    gfx_render_image(img, width, height, gfx_get_cursor_x() + 10, gfx_get_cursor_y());
+    gfx_render_image_by_index(1, gfx_get_cursor_x() + 10, gfx_get_cursor_y());
 }
 
 // -- MAIN --
@@ -63,11 +57,13 @@ void kernel_main(multiboot_info_t *mbi) {
     multiboot_set_info(mbi);
 
     gdt_init();
-    gfx_init();
     module_init();
     paging_init(multiboot_get_RAM_in_KB());
+    gfx_init();
+    idt_init();
+    timer_init(30);
+
+    sti();
 
     render_start_screen();
-
-    halt();
 }

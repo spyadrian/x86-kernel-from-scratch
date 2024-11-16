@@ -5,6 +5,11 @@
 
 // --- DEFINE ---
 
+#define FREQ_MIN 18
+#define FREQ_MAX 1193182
+
+// --- FUNCTION ---
+
 // Initializes the timer with the specified frequency in Hz.
 // Note that the effective frequency might be different than the desired one.
 // Use timer_get_freq() to obtain the effective frequency.
