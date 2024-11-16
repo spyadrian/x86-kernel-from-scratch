@@ -1,14 +1,56 @@
 %include "const.inc"
 
 ; --------------------------------------------------
+; MACRO
+
+; generate global function
+%macro gen_global_sym 3
+%assign i %2
+%rep (%3 - %2 + 1)
+
+    global _%1%+ i
+
+%assign i i+1
+
+%endrep
+%endmacro
+
+; generate interrupt/exception that don't have an error code [start, end]
+%macro gen_int_no_err 3
+%assign i %2
+%rep (%3 - %2 + 1)
+
+    _%1%+ i:
+        push 0                      ; dummy error code
+        push i                      ; number exception
+        jmp %1 %+ _wrapper
+
+%assign i i+1
+
+%endrep
+%endmacro
+
+; generate interrupt/exception that already have an error code [start, end]
+%macro gen_int_err 3
+%assign i %2
+%rep (%3 - %2 + 1)
+
+    _%1%+ i:
+        push i                     ; number exception
+        jmp %1 %+ _wrapper
+
+%assign i i+1
+
+%endrep
+%endmacro
+
+; --------------------------------------------------
 ; Make symbols below visible to the linker
 
 global idt_load
 
-global _exception3
-global _exception8
-
-global _irq5
+gen_global_sym exception, 0, 20
+gen_global_sym irq, 0, 14
 
 section .text                      ; start of the text (code) section
 align 4                            ; the code must be 4 byte aligned
@@ -24,22 +66,18 @@ idt_load:
 ; --------------------------------------------------
 ; First part of low level exception handlers
 
-_exception3:
-    push    3
-    jmp     exception_wrapper
-
-_exception8:
-    push    0  ; dummy error code
-    push    8
-    jmp     exception_wrapper
+gen_int_no_err exception, 0, 7
+gen_int_err exception, 8, 8
+gen_int_no_err exception, 9, 9
+gen_int_err exception, 10, 14
+gen_int_no_err exception, 15, 16
+gen_int_err exception, 17, 17
+gen_int_err exception, 18, 20
 
 ; --------------------------------------------------
 ; First part of low level hardware interrupt handlers
 
-_irq5:
-    push    0  ; dummy error code
-    push    5
-    jmp     irq_wrapper
+gen_int_no_err irq, 0, 14
 
 ; --------------------------------------------------
 ; Second part of low level exception handler
@@ -92,6 +130,8 @@ exception_wrapper:
 	; to exception_wrapper: error code and exception number
     add     esp,8
     iret
+
+extern irq_handler
 
 irq_wrapper:
     ; Save all registers
