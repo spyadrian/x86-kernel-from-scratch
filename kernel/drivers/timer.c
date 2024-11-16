@@ -47,6 +47,8 @@ static void timer_handler() {
 void timer_init(uint32_t freq_hz) {
 
     pepe_the_frog_idx = 0;
+    free_ticks_count = 0;
+    ticks_count = 0;
 
     // set freq
     if (freq_hz < FREQ_MIN || freq_hz > FREQ_MAX)
@@ -60,8 +62,6 @@ void timer_init(uint32_t freq_hz) {
     outb(PIT_CHANNEL0, divider >> 8);
 
     // install handler
-    ticks_count = 0;
-
     handler_t hd = {timer_handler, "IRQ_TIMER"};
     irq_install_handler(IRQ_TIMER, hd);
 }
