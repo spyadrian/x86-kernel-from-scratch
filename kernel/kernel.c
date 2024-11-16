@@ -9,6 +9,7 @@
 #include "interrupt/idt.h"
 #include "drivers/module.h"
 #include "boot/multiboot.h"
+#include "drivers/keyboard.h"
 
 // -- DEFINE --
 
@@ -62,8 +63,15 @@ void kernel_main(multiboot_info_t *mbi) {
     gfx_init();
     idt_init();
     timer_init(30);
+    keyb_init();
 
     sti();
 
     render_start_screen();
+
+    while (1) {
+
+        char c = keyb_get_key();
+        if (c != 0) gfx_printf("%c", c);
+    }
 }

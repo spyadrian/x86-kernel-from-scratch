@@ -44,4 +44,7 @@
 #define KEY_POUND          0x9C
 #define KEY_DEGREE         0xF8
 
+#define KEY_SHIFT_LEFT      0x2A
+#define KEY_SHIFT_RIGHT     0x36
+
 #endif
