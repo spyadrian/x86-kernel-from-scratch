@@ -1,6 +1,5 @@
 #include "pic.h"
 
-#include "term.h"
 #include "pmio/pmio.h"
 
 // --- DEFINE ---
@@ -39,8 +38,6 @@ void pic_init() {
     outb(PIC2_DATA, 0x02);
     outb(PIC1_DATA, 0x01);
     outb(PIC2_DATA, 0x01);
-
-    term_puts("PIC initialized.\n");
 }
 
 void pic_eoi(int irq) {
