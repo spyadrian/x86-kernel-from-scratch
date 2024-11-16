@@ -8,6 +8,9 @@
 #define IRQ_FIRST    0
 #define IRQ_LAST     15
 
+#define IRQ_TIMER       0
+#define IRQ_KEYBOARD    1
+
 typedef struct {
 
     void (*func)(void);   // pointer to handler function
