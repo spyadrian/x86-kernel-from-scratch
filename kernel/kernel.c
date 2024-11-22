@@ -60,10 +60,10 @@ void kernel_main(multiboot_info_t *mbi) {
     gdt_init();
     module_init();
     paging_init(multiboot_get_RAM_in_KB());
-    gfx_init();
     idt_init();
     timer_init(30);
     keyb_init();
+    gfx_init();
 
     sti();
 
