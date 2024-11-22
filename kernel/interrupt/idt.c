@@ -88,6 +88,7 @@ static const char *EXCEPTION_NAMES[] = {
     "Virtualization Exception"
 };
 
+/*
 static const char *IRQ_NAMES[] = {
 
     "System timer (PIT)",
@@ -107,6 +108,7 @@ static const char *IRQ_NAMES[] = {
     "Hard disk controller",
     "Reserved"
 };
+*/
 
 // --- ASSEMBLY FUNCTION ---
 
@@ -185,7 +187,7 @@ void irq_handler(regs_t *regs) {
 
     // gfx_printf_colored(YELLOW, BLACK, "INTERRUPT : %s\n", IRQ_NAMES[regs->number]);
     handler_t *hd = irq_get_handler(irq);
-    hd->func();
+    if (hd != NULL) hd->func();
 
     pic_eoi(irq);
 }
