@@ -44,7 +44,6 @@ void handle_key(uint16_t key) {
 
     if (key == 0) return;
 
-    gfx_printf_colored(BLACK, WHITE, "%d", key);
     key_handler_t handler = SPECIAL_KEY_HANDLERS[key];
     if (handler) {
 
