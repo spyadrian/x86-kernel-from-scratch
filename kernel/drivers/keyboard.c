@@ -62,7 +62,7 @@ static void keyboard_handler() {
 
 // --- FUNCTION ---
 
-void keyb_init() {
+void keyboard_init() {
 
     shifted = false;
 
@@ -74,7 +74,7 @@ void keyb_init() {
     irq_install_handler(IRQ_KEYBOARD, hd);
 }
 
-uint16_t keyb_get_key() {
+uint16_t keyboard_get_key() {
 
     if (buffer_idx == 0)
         return 0;

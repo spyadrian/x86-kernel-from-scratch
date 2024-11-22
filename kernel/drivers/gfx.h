@@ -108,6 +108,16 @@ void gfx_printf(char *str, ...);
  */
 void gfx_render_image(uint8_t *img, uint16_t width, uint16_t height, uint16_t x, uint16_t y);
 
+/**
+ * @brief Renders an image at a specified position on the screen using its index module.
+ *
+ * This function retrieves the image corresponding to the given index module
+ * and displays it at the specified (x, y) coordinates on the screen.
+ *
+ * @param idx The index module of the image to render.
+ * @param x   The x-coordinate of the top-left corner where the image will be rendered.
+ * @param y   The y-coordinate of the top-left corner where the image will be rendered.
+ */
 void gfx_render_image_by_index(uint16_t idx, uint16_t x, uint16_t y);
 
 #endif // _GFX_H_

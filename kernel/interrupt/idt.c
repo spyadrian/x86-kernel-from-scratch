@@ -151,11 +151,20 @@ void (*_EXCEPTIONS_IRQS[])() = {
 
 // --- STATIC FUNCTION ---
 
-// Builds and returns an IDT entry.
-// selector is the code segment selector to access the ISR
-// offset is the address of the ISR (for task gates, offset must be 0)
-// type indicates the IDT entry type
-// dpl is the privilege level required to call the associated ISR
+/**
+ * @brief Builds an IDT entry with the specified parameters.
+ *
+ * Constructs an IDT entry with the given code segment selector, ISR offset,
+ * entry type, and privilege level. This entry is used to define the behavior 
+ * of interrupts and exceptions.
+ *
+ * @param selector Code segment selector for accessing the ISR.
+ * @param offset   Address of the Interrupt Service Routine (ISR).
+ *                 For task gates, this value must be 0.
+ * @param type     Type of the IDT entry (e.g., interrupt gate).
+ * @param dpl      Descriptor Privilege Level required to invoke the ISR.
+ * @return A fully populated IDT entry.
+ */
 static idt_entry_t idt_build_entry(uint16_t selector, uint32_t offset, uint8_t type, uint8_t dpl) {
 
     idt_entry_t entry;
@@ -171,16 +180,32 @@ static idt_entry_t idt_build_entry(uint16_t selector, uint32_t offset, uint8_t t
     return entry;
 }
 
-// --- FUNCTIONS ---
-
-// High-level ISR for processor exceptions
+/**
+ * @brief Handles hardware interrupts.
+ *
+ * This function is invoked for all hardware-generated interrupts.
+ * It identifies and executes the associated interrupt handler and
+ * sends an End-of-Interrupt (EOI) signal to the Programmable Interrupt
+ * Controller (PIC).
+ *
+ * @param regs Pointer to the register state at the time of the interrupt.
+ */
 void exception_handler(regs_t *regs) {
 
     gfx_printf_colored(RED, BLACK, "EXCEPTION : %s\n", EXCEPTION_NAMES[regs->number]);
     halt();
 }
 
-// High-level ISR for hardware interrupts
+/**
+ * @brief Handles hardware interrupts.
+ *
+ * This function is invoked for all hardware-generated interrupts.
+ * It identifies and executes the associated interrupt handler and
+ * sends an End-of-Interrupt (EOI) signal to the Programmable Interrupt
+ * Controller (PIC).
+ *
+ * @param regs Pointer to the register state at the time of the interrupt.
+ */
 void irq_handler(regs_t *regs) {
 
     uint32_t irq = regs->number;
@@ -191,6 +216,8 @@ void irq_handler(regs_t *regs) {
 
     pic_eoi(irq);
 }
+
+// --- FUNCTIONS ---
 
 void idt_init() {
 

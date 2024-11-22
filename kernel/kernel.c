@@ -65,7 +65,7 @@ void kernel_main(multiboot_info_t *mbi) {
 
     idt_init();
     timer_init(30);
-    keyb_init();
+    keyboard_init();
     gfx_init();
 
     sti(); // active irqs
@@ -73,5 +73,5 @@ void kernel_main(multiboot_info_t *mbi) {
     // - render -
     render_start_screen();
 
-    while (1) handle_key(keyb_get_key());
+    while (1) handle_key(keyboard_get_key());
 }
