@@ -50,7 +50,7 @@ static void fix_cursor() {
     }
 }
 
-static void print_char_colored(uint16_t color, uint16_t back_color, char c) {
+static void print_char_colored(uint16_t color, uint16_t back_color, uint8_t c) {
 
     int idx = FONT_HEIGHT * c;
 
