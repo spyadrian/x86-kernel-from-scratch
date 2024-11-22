@@ -10,6 +10,7 @@
 #include "drivers/module.h"
 #include "boot/multiboot.h"
 #include "drivers/keyboard.h"
+#include "drivers/key_handler.h"
 
 // -- DEFINE --
 
@@ -55,23 +56,22 @@ void render_start_screen() {
 
 void kernel_main(multiboot_info_t *mbi) {
 
+    // - initialize -
     multiboot_set_info(mbi);
 
     gdt_init();
     module_init();
     paging_init(multiboot_get_RAM_in_KB());
+
     idt_init();
     timer_init(30);
     keyb_init();
     gfx_init();
 
-    sti();
+    sti(); // active irqs
 
+    // - render -
     render_start_screen();
 
-    while (1) {
-
-        char c = keyb_get_key();
-        if (c != 0) gfx_printf("%c", c);
-    }
+    while (1) handle_key(keyb_get_key());
 }

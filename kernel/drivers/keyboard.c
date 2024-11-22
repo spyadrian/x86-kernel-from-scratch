@@ -18,7 +18,7 @@
 
 extern keymap_t *keymap;
 
-static char buffer[BUFFER_SIZE];
+static uint16_t buffer[BUFFER_SIZE];
 static uint32_t buffer_idx;
 
 static bool shifted;
@@ -45,8 +45,6 @@ static void keyboard_handler() {
 
             shifted = pressed;
         break;
-
-        // TODO: handle special keys here ?
 
         default:
 
@@ -76,7 +74,7 @@ void keyb_init() {
     irq_install_handler(IRQ_KEYBOARD, hd);
 }
 
-char keyb_get_key() {
+uint16_t keyb_get_key() {
 
     if (buffer_idx == 0)
         return 0;
