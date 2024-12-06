@@ -137,4 +137,14 @@ void paging_load_pagedir(PDE_t *pagedir);
  */
 PDE_t *paging_get_current_pagedir();
 
+// Allocates size bytes of physical memory (as frames, so not necessarily contiguous), then maps these
+// frames at virtual address virt_addr. The area at virt_addr is guaranteed to be contiguous.
+// The mapping is performed in the specified page directory.
+// This function dynamically allocates the necessary frames to store the page tables and stores
+// their addresses into page_tables so that they can be subsequently freed.
+// If NULL is passed in page_tables, then the allocated frames' addresses won't be stored.
+// IMPORTANT: virt_addr and phys_addr must be aligned to a page size (4KB).
+// Returns the number of frames allocated (including frames used to store page tables).
+uint32_t paging_alloc(PDE_t *pagedir, PTE_t *page_tables[PAGETABLES_IN_PD], uint32_t virt_addr, uint32_t size, enum privilege_t privilege);
+
 #endif // _PAGING_H_

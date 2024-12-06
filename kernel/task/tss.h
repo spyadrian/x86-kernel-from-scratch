@@ -1,7 +1,7 @@
 #ifndef _TSS_H_
 #define _TSS_H_
 
-#include "common/types.h"
+#include <stdint.h>
 
 // IMPORTANT: by default (if IOMAP is 0) all ports are accessibles from ring 3!
 // Set to 1 if iomap is needed (forbid or allow access to IO ports from user mode).

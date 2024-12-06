@@ -154,3 +154,32 @@ void paging_mmap(PDE_t *pde, uint32_t virt_addr, uint32_t phys_addr, uint32_t si
         mmap_page(pde, virt_addr + (i * PAGE_SIZE), phys_addr + (i * PAGE_SIZE), privilege, access);
     }
 }
+
+uint32_t paging_alloc(PDE_t *pagedir, PTE_t *page_tables[PAGETABLES_IN_PD], uint32_t virt_addr, uint32_t size, enum privilege_t privilege) {
+
+    // virtual address must be aligned to PAGE_SIZE!
+    if (virt_addr % PAGE_SIZE) halt();
+
+    // skip entries of already allocated pagetables since we'll need to store newly allocated page tables
+    uint_t pt_offset = 0;
+    while (page_tables && page_tables[pt_offset])
+        pt_offset++;
+
+    int pt_count = 0;
+    uint_t frame_count = PAGE_COUNT(size); // how many frames do we need?
+    if (frame_count == 0) return 0;
+
+    for (uint_t i = 0; i < frame_count; i++) {
+
+        uint32_t frame_addr = (uint32_t)frame_alloc();
+        PTE_t *page_table = mmap_page(pagedir, virt_addr, frame_addr, privilege, ACCESS_READWRITE);
+
+        // A new page table was just allocated, store it into the input page_tables array of pointer to page tables
+        if (page_tables && page_table)
+            page_tables[pt_offset + pt_count++] = page_table;
+
+        virt_addr += PAGE_SIZE;
+    }
+
+    return pt_count+frame_count;
+}
