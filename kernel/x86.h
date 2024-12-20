@@ -11,6 +11,10 @@ static inline void sti() {
     asm volatile("sti");
 }
 
+static inline void iret() {
+    asm volatile("iret");
+}
+
 // Halt the processor.
 // External interrupts wake up the CPU, hence the cli instruction.
 static inline void halt() {
