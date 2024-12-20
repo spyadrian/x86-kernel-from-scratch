@@ -34,7 +34,7 @@ void *module_get_addr(uint16_t idx) {
 
 uint32_t module_size(uint16_t idx) {
 
-    return (uint32_t)(_mods[idx].mod_start - _mods[idx].mod_end);
+    return (uint32_t)(_mods[idx].mod_end - _mods[idx].mod_start);
 }
 
 char *module_cmdline(uint16_t idx) {
