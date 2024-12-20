@@ -129,9 +129,7 @@ void paging_init(uint32_t RAM_in_KB) {
 
     // - identity mapping framebuffer -
     uint32_t framebuffer_size = mbi->framebuffer_pitch * mbi->framebuffer_height;
-
     paging_mmap(kernel_pde, mbi->framebuffer_addr, mbi->framebuffer_addr, framebuffer_size, PRIVILEGE_KERNEL, ACCESS_READWRITE);
-    paging_mmap(kernel_pde, VIRTUAL_FRAMEBUFFER_ADDR, mbi->framebuffer_addr, framebuffer_size, PRIVILEGE_KERNEL, ACCESS_READWRITE);
 
     // - mapping guard page -
     unmap_page(kernel_pde, 0x0);
