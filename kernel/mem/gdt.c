@@ -2,6 +2,7 @@
 #include "common/mem.h"
 #include "gdt.h"
 #include "descriptors.h"
+#include "kernel/task/task.h"
 
 // Descriptor system bit (S)
 // For code or data segments
@@ -33,7 +34,7 @@ extern void gdt_load(gdt_ptr_t *gdt_ptr);
 //   3: user code
 //   4: user data
 //   5: initial tss
-static gdt_entry_t gdt[6];
+static gdt_entry_t gdt[6 + MAX_TASK_COUNT];
 static gdt_ptr_t gdt_ptr;
 
 // Used in future task code

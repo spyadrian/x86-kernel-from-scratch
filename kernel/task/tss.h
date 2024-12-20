@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+// --- DEFINE ---
+
 // IMPORTANT: by default (if IOMAP is 0) all ports are accessibles from ring 3!
 // Set to 1 if iomap is needed (forbid or allow access to IO ports from user mode).
 // It requires an extra 8KB in the TSS to store the ports bitmap.
@@ -10,6 +12,7 @@
 
 // Task-State Segment (TSS) structure.
 typedef struct {
+
     uint16_t previous_task_link, reserved0;
     uint32_t esp0;
     uint16_t ss0, reserved1;

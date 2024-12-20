@@ -1,17 +1,20 @@
 #ifndef _TASK_H_
 #define _TASK_H_
 
-#include "common/types.h"
-#include "mem/paging.h"
+#include <stdint.h>
+#include <stdbool.h>
+
 #include "tss.h"
+#include "mem/paging.h"
+
+// --- DEFINE ---
 
 #define MAX_TASK_COUNT  8
-
 // Virtual address (1GB) where task user code/data is mapped (i.e. application entry point)
 #define TASK_VIRT_ADDR 0x40000000
 
-// Structure of a task.
 typedef struct {
+
     PDE_t pagedir[PAGETABLES_IN_PD] __attribute__((aligned(4096)));  // Task page directory
     tss_t tss __attribute__((aligned(4096)));   // Context of the task (must not cross a page boundary!)
     PTE_t *page_tables[PAGES_IN_PT];            // Save pointers to page tables in order to deallocate
@@ -20,18 +23,30 @@ typedef struct {
     uint8_t kernel_stack[65536];                // kernel stack
     uint32_t virt_addr;                         // Start of the task's virtual address space
     uint32_t addr_space_size;                   // Size of the task's address space in bytes
+
     // TODO: add whathever you'd like...
 } task_t;
 
+// --- FUNCTION ---
+
+// Initializes the task subsystem.
 void tasks_init();
 
+// Returns a pointer to the current task.
+// If NULL is returned it means we are in the kernel.
 task_t *task_get_current();
 
+// Loads a task and executes it.
+// Returns false if failed.
 bool task_exec(char *filename);
 
-// Implemented in task_asm.s
+// implemented in task_asm.s
 void task_ltr(uint16_t tss_selector);
+
+// implemented in task_asm.s
 void task_switch(uint16_t tss_selector);
+
+// implemented in task_asm.s
 uint16_t task_get_current_sel();
 
 #endif

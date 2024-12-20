@@ -2,6 +2,7 @@
 
 #include "x86.h"
 #include "mem/gdt.h"
+#include "task/task.h"
 #include "mem/paging.h"
 #include "drivers/gfx.h"
 #include "common/string.h"
@@ -62,16 +63,19 @@ void kernel_main(multiboot_info_t *mbi) {
     gdt_init();
     module_init();
     paging_init(multiboot_get_RAM_in_KB());
+    tasks_init();
 
     idt_init();
     timer_init(30);
     keyboard_init();
     gfx_init();
 
-    sti(); // active irqs
+    // sti(); // active irqs
 
     // - render -
     render_start_screen();
+
+    task_exec("hello");
 
     while (1) handle_key(keyboard_get_key());
 }
