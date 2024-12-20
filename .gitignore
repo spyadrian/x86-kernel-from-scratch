@@ -11,3 +11,6 @@ compile_commands.json
 
 # - debug -
 gdb_cmd.txt
+
+# - user -
+user/*.exe

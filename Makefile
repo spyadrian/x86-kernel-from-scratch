@@ -81,13 +81,17 @@ debug: $(ISO_NAME)
 # Requires grub-mkrescue and xorriso
 # NOTE: on hosts that boot via UEFI, the path /usr/lib/grub/i386-pc is required
 # by grub-mkrescue otherwise the ISO won't be bootable by qemu.
-$(ISO_NAME): msg $(GRUB_CONF) kernel
+$(ISO_NAME): msg $(GRUB_CONF) kernel user
 	mkdir -p build/boot/grub build/data/
 	cp $(GRUB_CONF) build/boot/grub/
 	cp kernel/kernel.elf build/boot/
 	cp resources/* build/data/
+	cp user/*.exe build/data/
 	grub-mkrescue $(GRUB_MKRESCUE_ARGS) -o $@ build
 	@echo "Built the $@ image for a $(SYSTEM) system."
+
+user:
+	$(MAKE) -C $@ CC_DEFINES=$(CC_DEFINES) CC_FLAGS="$(CC_FLAGS)" LD_FLAGS="$(LD_FLAGS)"
 
 common:
 	$(MAKE) -C $@ CC_DEFINES=$(CC_DEFINES) CC_FLAGS="$(CC_FLAGS)" LD_FLAGS="$(LD_FLAGS)"
@@ -104,5 +108,6 @@ clean:
 	/bin/rm -rf build $(ISO_NAME)
 	$(MAKE) -C common clean
 	$(MAKE) -C kernel clean
+	$(MAKE) -C user clean
 
-.PHONY: clean common kernel
+.PHONY: clean common kernel user
