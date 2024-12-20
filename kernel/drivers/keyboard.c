@@ -1,10 +1,10 @@
 #include "keyboard.h"
 
 #include <stdint.h>
-#include <string.h>
 
 #include "x86.h"
 #include "pmio/pmio.h"
+#include "common/mem.h"
 #include "interrupt/irq.h"
 #include "keymaps/keymap.h"
 #include "common/keycodes.h"
