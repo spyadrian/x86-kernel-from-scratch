@@ -2,6 +2,7 @@
 #define _GDT_H_
 
 #include "task/tss.h"
+#include "kernel/descriptors.h"
 
 // kernel code and data selectors in the GDT
 #define GDT_KERNEL_CODE_SELECTOR   (8 | DPL_KERNEL)
@@ -15,6 +16,7 @@
 // Section 3.4.5 of Intel 64 & IA32 architectures software developer's manual describes
 // segment descriptors while section 6.2.2 describes TSS descriptors.
 typedef struct gdt_entry_st {
+
     uint16_t lim15_0;
     uint16_t base15_0;
     uint8_t base23_16;
@@ -33,8 +35,10 @@ typedef struct gdt_entry_st {
     uint8_t base31_24;
 } __attribute__((packed)) gdt_entry_t;
 
-extern void gdt_init();
-extern uint_t gdt_entry_to_selector(gdt_entry_t *entry);
-extern gdt_entry_t gdt_make_tss(tss_t *tss, uint8_t dpl);
+void gdt_init();
+
+uint32_t gdt_entry_to_selector(gdt_entry_t *entry);
+
+gdt_entry_t gdt_make_tss(tss_t *tss, uint8_t dpl);
 
 #endif
