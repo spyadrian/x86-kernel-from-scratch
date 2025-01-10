@@ -27,23 +27,10 @@ static uint8_t current_task_idx;
 
 // --- STATIC FUNCTION ---
 
-// Task 's code ( simply writes some white pixels ) .
-static void dummy_task_code () {
-
-    while (1) {};
-    uint16_t *fb = (uint16_t *)0xFE000000;
-
-    for (int i = 0; i < 640 * 240; i++) {
-        fb[i] = 0xFFFF ; // white
-    }
-
-    iret();
-}
-
 // Creates and returns a task from the fixed pool of tasks.
 // This function dynamically allocates the address space of size "size" (in bytes) for the task.
 // Returns NULL if failed.
-static task_t *task_create(void *task_code, uint32_t addr_space_size) {
+static task_t *task_create(uint32_t addr_space_size) {
 
     task_t *t = tasks + current_task_idx;
     memset(t, 0, sizeof(task_t));
@@ -63,12 +50,11 @@ static task_t *task_create(void *task_code, uint32_t addr_space_size) {
     tss->cs = GDT_USER_CODE_SELECTOR;                           // user code segment
     tss->ds = tss->es = tss->fs = tss->gs = tss->ss = GDT_USER_DATA_SELECTOR;
     tss->cr3 = (uint32_t)t->pagedir;                            // task's page directory
-    tss->eflags = (0 << 9);                                     // enable hardware interrupts
+    tss->eflags = (1 << 9);                                     // enable hardware interrupts
     tss->ss0 = GDT_KERNEL_DATA_SELECTOR;                        // task's kernel stack segment
     tss->esp0 = (uint32_t)(t->kernel_stack) + sizeof(t->kernel_stack);      // task's kernel stack ptr
     tss->eip = TASK_VIRT_ADDR;                                  // task's instruction ptr
     tss->esp = tss->ebp = TASK_VIRT_ADDR + t->addr_space_size + TASK_STACK_SIZE_MB * 1024 * 1024;  // task's stack and stack frame ptr
-    // tss->esp = tss->ebp = TASK_VIRT_ADDR + addr_space_size;
 
     // identity maps available RAM so kernel code can access its own code/data
     paging_mmap(t->pagedir, 0, 0, multiboot_get_RAM_in_KB() * 1024, PRIVILEGE_KERNEL, ACCESS_READWRITE);
@@ -77,11 +63,6 @@ static task_t *task_create(void *task_code, uint32_t addr_space_size) {
     multiboot_info_t *mbi = multiboot_get_info();
     uint32_t framebuffer_size = mbi->framebuffer_pitch * mbi->framebuffer_height;
     paging_mmap(t->pagedir, mbi->framebuffer_addr, mbi->framebuffer_addr, framebuffer_size, PRIVILEGE_USER, ACCESS_READWRITE);
-
-    // allocates task address space (content is zeroed) and copies its content into it
-    // void *task_code_frame = frame_alloc();
-    // memcpy(task_code_frame, task_code, 1024);
-    // paging_mmap(t->pagedir, t->virt_addr, (uint32_t)task_code_frame, PAGE_SIZE, PRIVILEGE_USER, ACCESS_READWRITE);
 
     // page and frame alloc for task code, data and stack
     paging_alloc(t->pagedir, t->page_tables, t->virt_addr, t->addr_space_size + TASK_STACK_SIZE_MB * 1024 * 1024, PRIVILEGE_USER);
@@ -94,15 +75,20 @@ static task_t *task_create(void *task_code, uint32_t addr_space_size) {
 // This function frees the task's page frames.
 static void task_free(task_t *t) {
 
-    // TODO:
+    for (uint16_t i = 0; i < PAGES_IN_PT; i++) {
+        if (t->page_tables[i])
+            frame_free((void *)FRAME_NB_TO_ADDR(t->page_tables[i]->frame_number));
+    }
+
+    frame_free((void *)t->page_tables);
+
+    current_task_idx -= 1;
 }
 
 // Creates a new task with the content of the specified binary application.
 // Once loaded, the task is ready to be executed.
 // Returns NULL if failed (ie. reached max number of tasks).
 static task_t *task_load(char *name) {
-
-    // return task_create(dummy_task_code, 4000);
 
     char n[64] = "";
     if (current_task_idx == MAX_TASK_COUNT || strcmp(name, n) == 0)
@@ -125,7 +111,7 @@ static task_t *task_load(char *name) {
     if (task_code == NULL)
         return NULL;
 
-    task_t *t = task_create(task_code, task_size);
+    task_t *t = task_create(task_size);
 
     PDE_t *pde_backup = paging_get_current_pagedir();
 
