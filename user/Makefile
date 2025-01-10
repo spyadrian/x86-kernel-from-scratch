@@ -12,7 +12,7 @@ DEP=$(USER_C_OBJ:%.o=%.d)
 
 APP_DEP=entrypoint_asm.o syscall_asm.o ulibc.o $(COMMON_OBJ)
 
-APPS=hello.exe
+APPS=hello.exe sys_test.exe
 
 all: $(APPS)
 
