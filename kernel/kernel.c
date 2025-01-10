@@ -70,12 +70,12 @@ void kernel_main(multiboot_info_t *mbi) {
     keyboard_init();
     gfx_init();
 
-    // sti(); // active irqs
+    sti(); // active irqs
 
     // - render -
     render_start_screen();
 
-    task_exec("hello");
+    task_exec("sys_test");
 
     while (1) handle_key(keyboard_get_key());
 }

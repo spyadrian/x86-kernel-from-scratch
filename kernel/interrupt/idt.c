@@ -10,6 +10,7 @@
 #include "common/mem.h"
 #include "descriptors.h"
 #include "drivers/pic.h"
+#include "syscall/syscall.h"
 
 // --- DEFINE ---
 
@@ -237,6 +238,8 @@ void idt_init() {
     // build entry for interrupts
     for (uint32_t i = FIRST_IRQ; i <= LAST_IRQ; i++)
         idt[i + IRQ_REMAP_OFFSET] = idt_build_entry(GDT_KERNEL_CODE_SELECTOR, (uint32_t)_EXCEPTIONS_IRQS[j++], TYPE_INTERRUPT_GATE, DPL_KERNEL);
+
+    idt[48] = idt_build_entry(GDT_KERNEL_CODE_SELECTOR, (uint32_t)_syscall_handler, TYPE_TRAP_GATE, DPL_USER);
 
     // load the idt on the CPU
     idt_load(&idt_ptr);
