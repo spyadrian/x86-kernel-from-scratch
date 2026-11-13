@@ -1,37 +1,61 @@
-# Yoctos
+# x86 Kernel from Scratch
 
-A small **x86 (32-bit) operating system** written from scratch in C and assembly – hepia, Advanced Systems Programming, 2024-2025.
+A small **32-bit x86 operating system** written in C and assembly: it boots with GRUB, sets up memory protection and paging, handles interrupts, drives the screen and the keyboard, and runs **user-space tasks** that talk to the kernel through **system calls**.
+
+> hepia (HES-SO Geneva) · Advanced Systems Programming · 2024-2025 · Solo project
+> The OS is called *YoctOS* in the course.
 
 ## Features
 
-- Boots with **GRUB** (Multiboot), BIOS or UEFI
-- **GDT / IDT**, interrupt and IRQ handling, PIC and **timer**
-- **Paging** and physical frame allocator
-- **Graphics driver** (framebuffer) with font rendering and `printf`
-- **PS/2 keyboard** driver with a Swiss-French keymap
-- **Tasks** (TSS, task creation / loading / freeing) and **system calls**
-- Minimal user-space C library (`ulibc`) and test applications loaded as GRUB modules
+| Area | What is implemented |
+|---|---|
+| **Boot** | Multiboot kernel loaded by GRUB (BIOS or UEFI), with files passed as GRUB modules (text, images, user programs) |
+| **Memory** | GDT with kernel / user segments, **paging** (4 KB pages, identity-mapped kernel) and a **physical frame allocator** |
+| **Interrupts** | IDT, CPU exceptions, PIC remapping, hardware IRQs |
+| **Drivers** | VBE framebuffer graphics (text rendering with a bitmap font, `printf`, images), **PIT timer** (ticks, sleep, an animation refreshed on each tick), **PS/2 keyboard** with a Swiss-French keymap |
+| **Tasks** | task creation, loading and freeing, with a TSS for the switch between user and kernel privilege levels |
+| **System calls** | read a key, timer info, sleep, set a pixel, execute a task – used by a minimal user-space C library (`ulibc`) and test programs |
 
 ## Build & run
 
-Requirements: `gcc` (with 32-bit support), `nasm`, `grub-mkrescue`, `xorriso`, `qemu-system-i386`.
+Requirements: Linux, `gcc` with 32-bit support, `nasm`, GRUB tools (`grub-mkrescue`, `xorriso`, `mtools`) and `qemu-system-i386`.
 
 ```bash
-make run                 # build the ISO and boot it in QEMU
-make run SYSTEM=BIOS     # BIOS instead of UEFI
-make debug               # run with GDB support
-make help                # all targets
+# Debian / Ubuntu
+sudo apt install build-essential gcc-multilib nasm grub-pc-bin grub-efi-ia32-bin xorriso mtools qemu-system-x86
+# Arch
+sudo pacman -S base-devel lib32-gcc-libs nasm grub xorriso mtools qemu-system-x86
+
+make run                 # build the ISO and boot it in QEMU (UEFI)
+make run SYSTEM=BIOS     # boot through BIOS instead
+make debug               # run QEMU waiting for GDB
+make                     # list all targets and options
 ```
 
-## Layout
+The ISO can also be written to a USB stick and booted on real hardware: `make PLATFORM=PC DEBUG=0 DEV=/dev/sdX deploy`.
 
-| Folder | Content |
-|---|---|
-| `kernel/` | boot, memory (GDT, paging, frames), interrupts, drivers, tasks, syscalls |
-| `common/` | code shared by kernel and user space (string, stdio, mem) |
-| `user/` | user-space library and applications |
-| `grub/` | GRUB configuration |
+## Project structure
+
+```
+├── kernel/
+│   ├── boot/        Multiboot entry point and boot information
+│   ├── mem/         GDT, paging, frame allocator
+│   ├── interrupt/   IDT, exceptions, IRQ handlers
+│   ├── drivers/     framebuffer, font, timer, PIC, keyboard, GRUB modules
+│   ├── keymaps/     keyboard layouts
+│   ├── task/        tasks and TSS
+│   └── syscall/     system call entry and dispatch
+├── common/          code shared by kernel and user space (string, stdio, memory, types)
+├── user/            user-space C library and test applications
+├── grub/            GRUB configuration (kernel + modules)
+└── resources/       data loaded as GRUB modules (welcome text, logo, animation frames)
+```
 
 ## Tech
 
-C · x86 assembly · GRUB / Multiboot · QEMU · GDB · Make
+C · x86 assembly (NASM) · GRUB / Multiboot · paging · interrupts · QEMU · GDB · Make
+
+## Credits & license
+
+My code is released under the [MIT license](LICENSE).
+The course provided the starting skeleton – build system, Multiboot structures, bitmap font, assembly stubs and the user-space `ulibc` – along with the empty versions of the modules implemented in this project, and the YoctOS logo.
