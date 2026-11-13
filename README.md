@@ -2,6 +2,9 @@
 
 A small **32-bit x86 operating system** written in C and assembly: it boots with GRUB, sets up memory protection and paging, handles interrupts, drives the screen and the keyboard, and runs **user-space tasks** that talk to the kernel through **system calls**.
 
+<p align="center"><img src="docs/demo.gif" width="640" alt="The OS running in QEMU: a user task paints the framebuffer, sleeps through a system call and repaints it, while the timer animates a sprite"></p>
+<p align="center"><sub>Running in QEMU: the <code>sys_test</code> user task paints the screen, sleeps one second through a system call, then repaints it, while the timer interrupt animates the sprite in the corner.</sub></p>
+
 > hepia (HES-SO Geneva) · Advanced Systems Programming · 2024-2025 · Solo project
 > The OS is called *YoctOS* in the course.
 
@@ -48,7 +51,8 @@ The ISO can also be written to a USB stick and booted on real hardware: `make PL
 ├── common/          code shared by kernel and user space (string, stdio, memory, types)
 ├── user/            user-space C library and test applications
 ├── grub/            GRUB configuration (kernel + modules)
-└── resources/       data loaded as GRUB modules (welcome text, logo, animation frames)
+├── resources/       data loaded as GRUB modules (welcome text, logo, animation frames)
+└── docs/            demo
 ```
 
 ## Tech
